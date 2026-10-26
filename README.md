@@ -1,4 +1,4 @@
-# multi-platform-orchestrator-infra
+# multi-platform-orchestrator-iac
 
 Terraform for the [multi-platform orchestrator](https://github.com/bendfeldt/multi-platform-orchestrator):
 Azure infrastructure, identities and platform grants. The solution repo deploys onto it and

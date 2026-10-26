@@ -11,7 +11,7 @@ unique_suffix = "x7k2"
 # Either or both CI systems.
 github = {
   owner         = "bendfeldt"
-  infra_repo    = "multi-platform-orchestrator-infra"
+  infra_repo    = "multi-platform-orchestrator-iac"
   solution_repo = "multi-platform-orchestrator"
 }
 # azure_devops = {
