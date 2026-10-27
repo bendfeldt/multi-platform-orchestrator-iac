@@ -33,17 +33,33 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # No Azure environment yet (bootstrap not run, variables not set): skip with a notice
+      # instead of failing at login on every push. Runs as normal once AZURE_CLIENT_ID is set.
+      - id: configured
+        env:
+          CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+          ENVIRONMENT: ${{ matrix.environment }}
+        run: |
+          if [ -n "$CLIENT_ID" ]; then
+            echo "ok=true" >>"$GITHUB_OUTPUT"
+          else
+            echo "::notice::Environment $ENVIRONMENT has no AZURE_CLIENT_ID yet; nothing applied."
+          fi
+      - if: steps.configured.outputs.ok
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3.1.0
+      - if: steps.configured.outputs.ok
+        uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3.1.0
         with:
           client-id: ${{ vars.AZURE_CLIENT_ID }}
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-      - run: |
+      - if: steps.configured.outputs.ok
+        run: |
           scripts/install-tools.sh
           echo "$HOME/.local/bin" >>"$GITHUB_PATH"
-      - run: scripts/apply.sh "$ENVIRONMENT"
+      - if: steps.configured.outputs.ok
+        run: scripts/apply.sh "$ENVIRONMENT"
         env:
           ENVIRONMENT: ${{ matrix.environment }}
